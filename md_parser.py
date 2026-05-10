@@ -50,29 +50,22 @@ def parse_cover(md_text: str) -> dict:
 def parse_md(md_text: str) -> list:
     """
     将 Markdown 文本解析为 block 列表。
-    封面跳过策略：第一个 # 标题之前的所有内容全部跳过（不管有没有 ---）。
-    标题层级自动适配：检测正文最浅标题层级，自动偏移映射到 h1/h2/h3。
+
+    标题规则（固定，不再自动检测层级）：
+      #   → 一级标题 h1（黑体，不加粗）
+      ##  → 二级标题 h2（宋体，加粗）
+      ### → 三级标题 h3（宋体，加粗）
+
+    封面跳过策略：
+      正文从第一个"数字开头的标题"开始（如 # 1. 或 ## 1.）
+      其他标题（文件名、封面大标题等）继续跳过
     """
     blocks = []
     lines  = md_text.splitlines()
 
-    # 自动检测正文最浅标题层级（第一个 # 标题开始算）
-    min_level = 4
-    found_first = False
-    for l in lines:
-        if not found_first and re.match(r'^#{1,4}\s+', l):
-            found_first = True
-        if found_first:
-            m = re.match(r'^(#{1,4})\s+', l)
-            if m:
-                min_level = min(min_level, len(m.group(1)))
-    if min_level == 4:
-        min_level = 1
-    level_offset = min_level - 1
-
     in_code    = False
     code_lines = []
-    skip_cover = True  # 跳过第一个标题之前的所有内容
+    skip_cover = True
 
     for line in lines:
         # ── 代码块 ──────────────────────────────────────────────────
@@ -92,43 +85,37 @@ def parse_md(md_text: str) -> list:
 
         stripped = line.strip()
 
-        # ── 跳过封面：遇到第一个标题才开始解析 ──────────────────────
+        # ── 跳过封面 ─────────────────────────────────────────────────
+        # 遇到"数字开头的标题"才算正文开始，其余标题行继续跳过
         if skip_cover:
-            if re.match(r'^#{1,4}\s+', line):
-                skip_cover = False
-                # 如果这个标题是封面大标题（含"课程设计"），跳过它
-                title_text = re.sub(r'^#{1,4}\s+', '', line).strip()
-                if '课程设计' in title_text or '莆田学院' in title_text:
-                    continue
-                # 否则是正文第一个标题，继续往下解析
+            m = re.match(r'^(#{1,3})\s+(.*)', line)
+            if m:
+                title_text = m.group(2).strip()
+                # 数字开头（1. 或 1 ）视为正文章节标题
+                if re.match(r'^\d+[\.\s]', title_text):
+                    skip_cover = False
+                    # 继续往下解析这一行
+                else:
+                    continue  # 封面标题，跳过
             else:
-                continue
+                continue  # 封面内容，跳过
 
         # ── 忽略分割线 ───────────────────────────────────────────────
         if stripped == '---':
             continue
 
-        # ── 标题映射 ─────────────────────────────────────────────────
-        h4 = re.match(r'^####\s+(.*)', line)
-        h3 = re.match(r'^###\s+(.*)',  line)
-        h2 = re.match(r'^##\s+(.*)',   line)
-        h1 = re.match(r'^#\s+(.*)',    line)
+        # ── 标题映射（固定规则）──────────────────────────────────────
+        # #   → h1，## → h2，### → h3，#### → h3
+        h3_plus = re.match(r'^#{3,}\s+(.*)', line)
+        h2      = re.match(r'^##\s+(.*)',    line)
+        h1      = re.match(r'^#\s+(.*)',     line)
 
-        if h4:
-            raw_level, text = 4, h4.group(1).strip()
-        elif h3:
-            raw_level, text = 3, h3.group(1).strip()
+        if h3_plus:
+            blocks.append({"type": "h3", "text": h3_plus.group(1).strip()})
         elif h2:
-            raw_level, text = 2, h2.group(1).strip()
+            blocks.append({"type": "h2", "text": h2.group(1).strip()})
         elif h1:
-            raw_level, text = 1, h1.group(1).strip()
-        else:
-            raw_level, text = 0, None
-
-        if raw_level > 0:
-            mapped = max(1, min(raw_level - level_offset, 3))
-            blocks.append({"type": f"h{mapped}", "text": text})
-            continue
+            blocks.append({"type": "h1", "text": h1.group(1).strip()})
         elif stripped == "":
             blocks.append({"type": "blank"})
         else:

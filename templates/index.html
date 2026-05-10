@@ -17,17 +17,17 @@
 
     /* 左侧设置面板 */
     .panel-left {
-      width:300px; flex-shrink:0;
+      width:360px; flex-shrink:0;
       overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;
       background:#fff; border-right:1px solid #e5e7eb;
     }
     .card { background:#f8f9fa; border-radius:8px; padding:14px; }
-    .card-title { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px; }
+    .card-title { font-size:12px; font-weight:700; color:#666; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
 
-    .form-group { margin-bottom:8px; }
-    .form-group label { display:block; font-size:12px; color:#666; margin-bottom:3px; }
+    .form-group { margin-bottom:10px; }
+    .form-group label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
     .form-group input, .form-group select {
-      width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:5px;
+      width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:5px;
       font-size:13px; outline:none; background:#fff;
     }
     .form-group input:focus, .form-group select:focus { border-color:#4f46e5; }
@@ -36,65 +36,70 @@
     .row3 > * { flex:1; }
     .row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 
-    .sub-label { font-size:11px; color:#aaa; margin:8px 0 4px; padding-left:2px; }
+    .sub-label { font-size:12px; color:#888; margin:10px 0 5px; padding-left:2px; font-weight:600; }
 
     #members-section { display:none; }
     .member-row { display:flex; gap:6px; margin-bottom:6px; align-items:center; }
     .member-row input { flex:1; }
     .btn-remove { background:none; border:none; color:#e53e3e; cursor:pointer; font-size:16px; padding:0 2px; }
-    .btn-add { font-size:12px; color:#4f46e5; background:none; border:1px dashed #4f46e5; border-radius:5px; padding:5px 10px; cursor:pointer; width:100%; margin-top:2px; }
+    .btn-add { font-size:13px; color:#4f46e5; background:none; border:1px dashed #4f46e5; border-radius:5px; padding:6px 10px; cursor:pointer; width:100%; margin-top:2px; }
     .btn-add:hover { background:#f0f0ff; }
 
-    .btn-generate { width:100%; padding:11px; background:#4f46e5; color:#fff; border:none; border-radius:7px; font-size:14px; font-weight:600; cursor:pointer; }
+    .btn-generate { width:100%; padding:12px; background:#4f46e5; color:#fff; border:none; border-radius:7px; font-size:15px; font-weight:600; cursor:pointer; }
     .btn-generate:hover { background:#4338ca; }
     .btn-generate:disabled { background:#a5b4fc; cursor:not-allowed; }
-    #status { font-size:12px; text-align:center; min-height:18px; color:#666; margin-top:4px; }
+    #status { font-size:13px; text-align:center; min-height:20px; color:#666; margin-top:4px; }
     #status.error { color:#e53e3e; }
     #status.success { color:#38a169; }
 
-    .en-note { font-size:11px; color:#9ca3af; margin-top:2px; }
+    .en-note { font-size:12px; color:#9ca3af; margin-top:3px; }
 
     /* 中间 MD 输入 */
     .panel-mid {
-      width:380px; flex-shrink:0;
+      flex:1; min-width:0;
       display:flex; flex-direction:column;
       border-right:1px solid #e5e7eb; background:#fafafa;
     }
-    .panel-mid-header { padding:10px 14px; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; }
-    .panel-mid-header span { font-size:13px; font-weight:600; }
-    .panel-mid-header small { font-size:11px; color:#999; }
+    .panel-mid-header { padding:10px 16px; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; }
+    .panel-mid-header span { font-size:14px; font-weight:600; }
+    .panel-mid-header small { font-size:12px; color:#999; }
     #md-input {
-      flex:1; width:100%; padding:14px; border:none; outline:none; resize:none;
-      font-family:"Consolas","Courier New",monospace; font-size:12px; line-height:1.7;
+      flex:1; width:100%; padding:16px; border:none; outline:none; resize:none;
+      font-family:"Consolas","Courier New",monospace; font-size:13px; line-height:1.7;
       background:#fafafa; color:#374151;
     }
-    .hint-box { margin:8px 12px; padding:8px 12px; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; font-size:11px; color:#92400e; line-height:1.6; }
+    .hint-box { margin:8px 12px; padding:8px 12px; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; font-size:12px; color:#92400e; line-height:1.6; }
     .hint-box code { background:#fef3c7; padding:1px 4px; border-radius:3px; font-family:monospace; }
 
     /* 右侧预览 */
-    .panel-right { flex:1; overflow-y:auto; background:#e5e7eb; padding:24px; display:flex; flex-direction:column; align-items:center; gap:0; }
-    .preview-label { font-size:11px; color:#9ca3af; margin-bottom:12px; align-self:flex-start; }
+    .panel-right {
+      width:420px; flex-shrink:0;
+      overflow-y:auto; background:#e5e7eb; padding:16px;
+      display:flex; flex-direction:column; align-items:center; gap:0;
+    }
+    .preview-label { font-size:11px; color:#9ca3af; margin-bottom:10px; align-self:flex-start; }
 
-    /* A4 纸模拟 */
+    /* A4 纸模拟 — 等比缩放适应右侧宽度 */
     .a4-page {
       background:#fff;
-      width:794px;
+      width:370px;
       box-shadow:0 2px 12px rgba(0,0,0,.15);
-      margin-bottom:24px;
+      margin-bottom:16px;
+      font-size:10px; /* 整体缩小，近似等比 */
     }
-    .a4-inner { padding:96px 120px; } /* 默认，JS 会覆盖 */
+    .a4-inner { padding:48px 52px; }
 
     /* 预览内容样式（由 JS 动态注入） */
     .pv-h1, .pv-h2, .pv-h3, .pv-body, .pv-code { display:block; }
     .pv-code-block { font-family:"Courier New",monospace; font-size:10pt; background:#f8f8f8; border-left:3px solid #ddd; padding:6px 12px; margin:4px 0 4px 24px; white-space:pre-wrap; line-height:1.5; }
 
     /* 封面预览 */
-    .pv-cover { text-align:center; padding:60px 40px 40px; }
-    .pv-cover-school { font-family:"楷体","KaiTi",serif; font-size:36pt; display:block; margin-bottom:12px; }
-    .pv-cover-title  { font-family:"黑体","SimHei",sans-serif; font-size:42pt; display:block; margin:12px 0 24px; letter-spacing:8px; }
-    .pv-cover-info   { font-family:"宋体","SimSun",serif; font-size:22pt; display:block; margin:4px 0; }
-    .pv-cover-date   { font-family:"宋体","SimSun",serif; font-size:18pt; font-weight:bold; display:block; margin-top:24px; }
-    .pv-cover-divider { border:none; border-top:1px solid #ccc; margin:32px 0; }
+    .pv-cover { text-align:center; padding:28px 20px 20px; }
+    .pv-cover-school { font-family:"楷体","KaiTi",serif; font-size:17pt; display:block; margin-bottom:6px; }
+    .pv-cover-title  { font-family:"黑体","SimHei",sans-serif; font-size:20pt; display:block; margin:6px 0 12px; letter-spacing:4px; }
+    .pv-cover-info   { font-family:"宋体","SimSun",serif; font-size:10pt; display:block; margin:2px 0; text-align:left; }
+    .pv-cover-date   { font-family:"宋体","SimSun",serif; font-size:8pt; font-weight:bold; display:block; margin-top:12px; }
+    .pv-cover-divider { border:none; border-top:1px solid #ccc; margin:16px 0; }
   </style>
 </head>
 <body>
@@ -210,9 +215,39 @@
     <small>## 一级 &nbsp;### 二级 &nbsp;#### 三级</small>
   </div>
   <div class="hint-box">
-    让 AI 按此格式输出：<code>## 1. 章节</code> <code>### 1.1 小节</code> <code>#### 1.1.1 细节</code>，代码用 <code>```</code> 包裹
+    推荐让 AI 生成时加上提示：<code>请用 Markdown 格式输出正文，章节用 #，小节用 ##，细节用 ###，代码用反引号包裹，不要写封面信息</code>
   </div>
-  <textarea id="md-input" placeholder="在这里粘贴 AI 生成的 Markdown 内容..." oninput="schedulePreview()"></textarea>
+  <textarea id="md-input" placeholder="粘贴 AI 生成的 Markdown 正文内容，格式示例：
+
+# 1. 负责模块
+
+## 1.1 模块概述
+
+本人主要负责数据采集与清洗模块...
+
+## 1.2 具体实现
+
+### 1.2.1 数据采集
+
+采集模块位于 src/data_crawler.py...
+
+核心代码：
+
+\`\`\`python
+def fetch_data():
+    df = pd.read_csv('data.csv')
+    return df
+\`\`\`
+
+# 2. 总结
+
+通过本次课程设计，我掌握了...
+
+---
+注意：
+• 封面信息（姓名、学号等）在左侧表单填写
+• # 一级标题  ## 二级标题  ### 三级标题
+• 正文直接写段落，不需要缩进" oninput="schedulePreview()"></textarea>
 </div>
 
 <!-- 右侧预览 -->
@@ -268,18 +303,6 @@ function parseMd(text) {
   let inCode = false, codeLines = [];
   let skipCover = true;
 
-  // 检测正文最浅标题层级（第一个标题开始算）
-  let minLevel = 4, foundFirst = false;
-  for (const l of lines) {
-    if (!foundFirst && /^#{1,4}\s+/.test(l)) foundFirst = true;
-    if (foundFirst) {
-      const m = l.match(/^(#{1,4})\s+/);
-      if (m) minLevel = Math.min(minLevel, m[1].length);
-    }
-  }
-  if (minLevel === 4) minLevel = 1;
-  const levelOffset = minLevel - 1;
-
   for (const line of lines) {
     // 代码块
     if (line.trim().startsWith('```')) {
@@ -291,40 +314,34 @@ function parseMd(text) {
 
     const s = line.trim();
 
-    // 跳过封面：遇到第一个标题才开始
+    // 跳过封面：遇到数字开头的标题才开始
     if (skipCover) {
-      if (/^#{1,4}\s+/.test(line)) {
-        skipCover = false;
-        // 封面大标题（含"课程设计"）跳过
-        const titleText = line.replace(/^#{1,4}\s+/, '').trim();
-        if (titleText.includes('课程设计') || titleText.includes('莆田学院')) continue;
-        // 否则继续往下解析
+      const m = line.match(/^(#{1,3})\s+(.*)/);
+      if (m) {
+        const titleText = m[2].trim();
+        if (/^\d+[\.\s]/.test(titleText)) {
+          skipCover = false;
+          // 继续往下解析这一行
+        } else {
+          continue;
+        }
       } else {
         continue;
       }
     }
 
-    // 忽略分割线
     if (s === '---') continue;
 
-    // 标题映射（自动层级偏移）
-    const h4 = line.match(/^####\s+(.*)/);
-    const h3 = line.match(/^###\s+(.*)/);
-    const h2 = line.match(/^##\s+(.*)/);
-    const h1 = line.match(/^#\s+(.*)/);
+    // 标题映射：# → h1，## → h2，### 及以上 → h3
+    const h3p = line.match(/^#{3,}\s+(.*)/);
+    const h2  = line.match(/^##\s+(.*)/);
+    const h1  = line.match(/^#\s+(.*)/);
 
-    let rawLevel = 0, titleText = null;
-    if (h4)      { rawLevel = 4; titleText = h4[1].trim(); }
-    else if (h3) { rawLevel = 3; titleText = h3[1].trim(); }
-    else if (h2) { rawLevel = 2; titleText = h2[1].trim(); }
-    else if (h1) { rawLevel = 1; titleText = h1[1].trim(); }
-
-    if (rawLevel > 0) {
-      const mapped = Math.max(1, Math.min(rawLevel - levelOffset, 3));
-      blocks.push({type: `h${mapped}`, text: titleText});
-    } else if (s === '') {
-      blocks.push({type:'blank'});
-    } else {
+    if (h3p)     blocks.push({type:'h3', text: h3p[1].trim()});
+    else if (h2) blocks.push({type:'h2', text: h2[1].trim()});
+    else if (h1) blocks.push({type:'h1', text: h1[1].trim()});
+    else if (s === '') blocks.push({type:'blank'});
+    else {
       let t = line.replace(/^　+/, '').trim();
       t = t.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/`(.+?)`/g, '$1');
       if (t) blocks.push({type:'body', text: t});
@@ -339,11 +356,14 @@ function renderPreview() {
   const mdText = document.getElementById('md-input').value;
   const inner  = document.getElementById('a4-inner');
 
-  // 页边距（cm → px，A4=794px宽）
-  const pl = cm2px(fmt.margin_left);
-  const pr = cm2px(fmt.margin_right);
-  const pt = cm2px(fmt.margin_top);
-  const pb = cm2px(fmt.margin_bottom);
+  // 预览缩放比（370px / 794px ≈ 0.466）
+  const SCALE = 370 / 794;
+
+  // 页边距按缩放比换算
+  const pl = cm2px(fmt.margin_left)  * SCALE;
+  const pr = cm2px(fmt.margin_right) * SCALE;
+  const pt = cm2px(fmt.margin_top)   * SCALE;
+  const pb = cm2px(fmt.margin_bottom)* SCALE;
   inner.style.padding = `${pt}px ${pr}px ${pb}px ${pl}px`;
 
   // 封面信息
@@ -385,26 +405,26 @@ function renderPreview() {
   // 正文 blocks → HTML
   const blocks = parseMd(mdText);
   const lh     = fmt.line_spacing;
-  const bodyPx = fmt.body_size * 1.333; // pt → px
+  const bodyPx = fmt.body_size * 1.333 * SCALE;
   const indentPx = bodyPx * 2;
 
   let bodyHtml = '';
   for (const b of blocks) {
     if (b.type === 'blank') continue;
     if (b.type === 'h1') {
-      const sz = fmt.h1_size * 1.333;
+      const sz = fmt.h1_size * 1.333 * SCALE;
       bodyHtml += `<p style="font-family:${cnFont(fmt.h1_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h1_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.75}px 0 ${sz*0.375}px;">${esc(b.text)}</p>`;
     } else if (b.type === 'h2') {
-      const sz = fmt.h2_size * 1.333;
+      const sz = fmt.h2_size * 1.333 * SCALE;
       bodyHtml += `<p style="font-family:${cnFont(fmt.h2_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h2_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.375}px 0 ${sz*0.188}px;">${esc(b.text)}</p>`;
     } else if (b.type === 'h3') {
-      const sz = fmt.h3_size * 1.333;
+      const sz = fmt.h3_size * 1.333 * SCALE;
       bodyHtml += `<p style="font-family:${cnFont(fmt.h3_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h3_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.286}px 0 ${sz*0.143}px;">${esc(b.text)}</p>`;
     } else if (b.type === 'body') {
       bodyHtml += `<p style="font-family:${cnFont(fmt.body_font)},'Times New Roman';font-size:${bodyPx}px;line-height:${lh};text-indent:${indentPx}px;text-align:justify;margin:0;">${esc(b.text)}</p>`;
     } else if (b.type === 'code') {
       const codeContent = b.lines.map(l => esc(l)).join('\n');
-      bodyHtml += `<pre class="pv-code-block">${codeContent}</pre>`;
+      bodyHtml += `<pre class="pv-code-block" style="font-size:${9*SCALE}px">${codeContent}</pre>`;
     }
   }
 
