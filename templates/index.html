@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>课程设计报告生成器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Microsoft YaHei","PingFang SC",sans-serif; background:#f0f2f5; color:#333; min-height:100vh; }
+
+    header { background:#1a1a2e; color:#fff; padding:14px 24px; display:flex; align-items:center; gap:12px; }
+    header h1 { font-size:18px; font-weight:600; }
+    header span { font-size:12px; color:#aaa; }
+
+    /* 三栏布局 */
+    .layout { display:flex; height:calc(100vh - 52px); overflow:hidden; }
+
+    /* 左侧设置面板 */
+    .panel-left {
+      width:300px; flex-shrink:0;
+      overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;
+      background:#fff; border-right:1px solid #e5e7eb;
+    }
+    .card { background:#f8f9fa; border-radius:8px; padding:14px; }
+    .card-title { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px; }
+
+    .form-group { margin-bottom:8px; }
+    .form-group label { display:block; font-size:12px; color:#666; margin-bottom:3px; }
+    .form-group input, .form-group select {
+      width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:5px;
+      font-size:13px; outline:none; background:#fff;
+    }
+    .form-group input:focus, .form-group select:focus { border-color:#4f46e5; }
+
+    .row3 { display:flex; gap:6px; }
+    .row3 > * { flex:1; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+
+    .sub-label { font-size:11px; color:#aaa; margin:8px 0 4px; padding-left:2px; }
+
+    #members-section { display:none; }
+    .member-row { display:flex; gap:6px; margin-bottom:6px; align-items:center; }
+    .member-row input { flex:1; }
+    .btn-remove { background:none; border:none; color:#e53e3e; cursor:pointer; font-size:16px; padding:0 2px; }
+    .btn-add { font-size:12px; color:#4f46e5; background:none; border:1px dashed #4f46e5; border-radius:5px; padding:5px 10px; cursor:pointer; width:100%; margin-top:2px; }
+    .btn-add:hover { background:#f0f0ff; }
+
+    .btn-generate { width:100%; padding:11px; background:#4f46e5; color:#fff; border:none; border-radius:7px; font-size:14px; font-weight:600; cursor:pointer; }
+    .btn-generate:hover { background:#4338ca; }
+    .btn-generate:disabled { background:#a5b4fc; cursor:not-allowed; }
+    #status { font-size:12px; text-align:center; min-height:18px; color:#666; margin-top:4px; }
+    #status.error { color:#e53e3e; }
+    #status.success { color:#38a169; }
+
+    .en-note { font-size:11px; color:#9ca3af; margin-top:2px; }
+
+    /* 中间 MD 输入 */
+    .panel-mid {
+      width:380px; flex-shrink:0;
+      display:flex; flex-direction:column;
+      border-right:1px solid #e5e7eb; background:#fafafa;
+    }
+    .panel-mid-header { padding:10px 14px; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; }
+    .panel-mid-header span { font-size:13px; font-weight:600; }
+    .panel-mid-header small { font-size:11px; color:#999; }
+    #md-input {
+      flex:1; width:100%; padding:14px; border:none; outline:none; resize:none;
+      font-family:"Consolas","Courier New",monospace; font-size:12px; line-height:1.7;
+      background:#fafafa; color:#374151;
+    }
+    .hint-box { margin:8px 12px; padding:8px 12px; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; font-size:11px; color:#92400e; line-height:1.6; }
+    .hint-box code { background:#fef3c7; padding:1px 4px; border-radius:3px; font-family:monospace; }
+
+    /* 右侧预览 */
+    .panel-right { flex:1; overflow-y:auto; background:#e5e7eb; padding:24px; display:flex; flex-direction:column; align-items:center; gap:0; }
+    .preview-label { font-size:11px; color:#9ca3af; margin-bottom:12px; align-self:flex-start; }
+
+    /* A4 纸模拟 */
+    .a4-page {
+      background:#fff;
+      width:794px;
+      box-shadow:0 2px 12px rgba(0,0,0,.15);
+      margin-bottom:24px;
+    }
+    .a4-inner { padding:96px 120px; } /* 默认，JS 会覆盖 */
+
+    /* 预览内容样式（由 JS 动态注入） */
+    .pv-h1, .pv-h2, .pv-h3, .pv-body, .pv-code { display:block; }
+    .pv-code-block { font-family:"Courier New",monospace; font-size:10pt; background:#f8f8f8; border-left:3px solid #ddd; padding:6px 12px; margin:4px 0 4px 24px; white-space:pre-wrap; line-height:1.5; }
+
+    /* 封面预览 */
+    .pv-cover { text-align:center; padding:60px 40px 40px; }
+    .pv-cover-school { font-family:"楷体","KaiTi",serif; font-size:36pt; display:block; margin-bottom:12px; }
+    .pv-cover-title  { font-family:"黑体","SimHei",sans-serif; font-size:42pt; display:block; margin:12px 0 24px; letter-spacing:8px; }
+    .pv-cover-info   { font-family:"宋体","SimSun",serif; font-size:22pt; display:block; margin:4px 0; }
+    .pv-cover-date   { font-family:"宋体","SimSun",serif; font-size:18pt; font-weight:bold; display:block; margin-top:24px; }
+    .pv-cover-divider { border:none; border-top:1px solid #ccc; margin:32px 0; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>📄 课程设计报告生成器</h1>
+  <span>Markdown → 格式化 Word</span>
+</header>
+
+<div class="layout">
+
+<!-- 左侧设置面板 -->
+<div class="panel-left">
+
+  <div class="card">
+    <div class="card-title">报告类型</div>
+    <div class="form-group">
+      <select id="cover-type" onchange="onTypeChange()">
+        <option value="personal">个人报告</option>
+        <option value="group">小组报告</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">封面信息</div>
+    <div id="personal-section">
+      <div class="form-group"><label>姓名</label><input id="name" type="text" placeholder="张三" oninput="schedulePreview()" /></div>
+      <div class="form-group"><label>学号</label><input id="sid"  type="text" placeholder="2301000001" oninput="schedulePreview()" /></div>
+    </div>
+    <div id="members-section">
+      <div class="sub-label">成员（姓名 / 学号）</div>
+      <div id="members-list">
+        <div class="member-row">
+          <input type="text" placeholder="姓名" class="m-name" oninput="schedulePreview()" />
+          <input type="text" placeholder="学号" class="m-sid"  oninput="schedulePreview()" />
+          <button class="btn-remove" onclick="removeMember(this)">×</button>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addMember()">+ 添加成员</button>
+    </div>
+    <div class="form-group" style="margin-top:8px"><label>课程名称</label><input id="course"  type="text" placeholder="大数据分析与可视化项目实战" oninput="schedulePreview()" /></div>
+    <div class="form-group"><label>题目</label><input id="topic"   type="text" placeholder="全国空气质量数据可视化分析" oninput="schedulePreview()" /></div>
+    <div class="form-group"><label>专业班级</label><input id="major"  type="text" placeholder="大数据技术2301" oninput="schedulePreview()" /></div>
+    <div class="form-group"><label>指导教师</label><input id="teacher" type="text" placeholder="（指导教师姓名）" oninput="schedulePreview()" /></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">格式设置</div>
+    <div class="form-group"><label>学校名称</label><input id="fmt-school" type="text" placeholder="莆田学院新工科产业学院" oninput="schedulePreview()" /></div>
+
+    <div class="sub-label">一级标题（## ）</div>
+    <div class="row3">
+      <div class="form-group" style="margin:0"><label>中文字体</label>
+        <select id="fmt-h1-font" onchange="schedulePreview()">
+          <option value="黑体" selected>黑体</option><option value="宋体">宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h1-size" type="number" value="16" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h1-bold" type="checkbox" style="margin-top:6px" onchange="schedulePreview()" /></div>
+    </div>
+    <div class="en-note">英文字体固定为 Times New Roman</div>
+
+    <div class="sub-label">二级标题（### ）</div>
+    <div class="row3">
+      <div class="form-group" style="margin:0"><label>中文字体</label>
+        <select id="fmt-h2-font" onchange="schedulePreview()">
+          <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h2-size" type="number" value="16" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h2-bold" type="checkbox" style="margin-top:6px" checked onchange="schedulePreview()" /></div>
+    </div>
+
+    <div class="sub-label">三级标题（#### ）</div>
+    <div class="row3">
+      <div class="form-group" style="margin:0"><label>中文字体</label>
+        <select id="fmt-h3-font" onchange="schedulePreview()">
+          <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h3-size" type="number" value="14" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h3-bold" type="checkbox" style="margin-top:6px" checked onchange="schedulePreview()" /></div>
+    </div>
+
+    <div class="sub-label">正文</div>
+    <div class="row3">
+      <div class="form-group" style="margin:0"><label>中文字体</label>
+        <select id="fmt-body-font" onchange="schedulePreview()">
+          <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-body-size" type="number" value="12" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>行距</label><input id="fmt-line-spacing" type="number" value="1.5" min="1" max="3" step="0.25" oninput="schedulePreview()" /></div>
+    </div>
+
+    <div class="sub-label">页边距 cm</div>
+    <div class="row2">
+      <div class="form-group" style="margin:0"><label>上</label><input id="fmt-margin-top"    type="number" value="2.54" min="0" max="5" step="0.1" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>下</label><input id="fmt-margin-bottom" type="number" value="2.54" min="0" max="5" step="0.1" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>左</label><input id="fmt-margin-left"   type="number" value="3.17" min="0" max="5" step="0.1" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>右</label><input id="fmt-margin-right"  type="number" value="2.54" min="0" max="5" step="0.1" oninput="schedulePreview()" /></div>
+    </div>
+  </div>
+
+  <button class="btn-generate" id="btn-gen" onclick="generate()">⬇ 生成并下载 .docx</button>
+  <div id="status"></div>
+</div>
+
+<!-- 中间 MD 输入 -->
+<div class="panel-mid">
+  <div class="panel-mid-header">
+    <span>Markdown 内容</span>
+    <small>## 一级 &nbsp;### 二级 &nbsp;#### 三级</small>
+  </div>
+  <div class="hint-box">
+    让 AI 按此格式输出：<code>## 1. 章节</code> <code>### 1.1 小节</code> <code>#### 1.1.1 细节</code>，代码用 <code>```</code> 包裹
+  </div>
+  <textarea id="md-input" placeholder="在这里粘贴 AI 生成的 Markdown 内容..." oninput="schedulePreview()"></textarea>
+</div>
+
+<!-- 右侧预览 -->
+<div class="panel-right">
+  <div class="preview-label">📄 近似预览（仅供参考，实际以 Word 为准）</div>
+  <div class="a4-page" id="a4-page">
+    <div class="a4-inner" id="a4-inner">
+      <p style="color:#bbb;font-size:13px;text-align:center;margin-top:40px">粘贴内容后自动预览</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .layout -->
+
+<script>
+// ── 工具函数 ──────────────────────────────────────────────────────────
+function getFmt() {
+  return {
+    school:        document.getElementById('fmt-school').value        || '莆田学院新工科产业学院',
+    h1_font:       document.getElementById('fmt-h1-font').value,
+    h1_size:       parseFloat(document.getElementById('fmt-h1-size').value)   || 16,
+    h1_bold:       document.getElementById('fmt-h1-bold').checked,
+    h2_font:       document.getElementById('fmt-h2-font').value,
+    h2_size:       parseFloat(document.getElementById('fmt-h2-size').value)   || 16,
+    h2_bold:       document.getElementById('fmt-h2-bold').checked,
+    h3_font:       document.getElementById('fmt-h3-font').value,
+    h3_size:       parseFloat(document.getElementById('fmt-h3-size').value)   || 14,
+    h3_bold:       document.getElementById('fmt-h3-bold').checked,
+    body_font:     document.getElementById('fmt-body-font').value,
+    body_size:     parseFloat(document.getElementById('fmt-body-size').value) || 12,
+    line_spacing:  parseFloat(document.getElementById('fmt-line-spacing').value) || 1.5,
+    margin_top:    parseFloat(document.getElementById('fmt-margin-top').value)    || 2.54,
+    margin_bottom: parseFloat(document.getElementById('fmt-margin-bottom').value) || 2.54,
+    margin_left:   parseFloat(document.getElementById('fmt-margin-left').value)   || 3.17,
+    margin_right:  parseFloat(document.getElementById('fmt-margin-right').value)  || 2.54,
+  };
+}
+
+// cm → px（96dpi）
+function cm2px(cm) { return cm * 37.795; }
+
+// 中文字体名 → CSS font-family
+function cnFont(name) {
+  const map = { '黑体':'SimHei,"黑体",sans-serif', '宋体':'SimSun,"宋体",serif',
+                '楷体':'KaiTi,"楷体",serif', '仿宋':'FangSong,"仿宋",serif' };
+  return map[name] || name;
+}
+
+// ── MD 解析（前端轻量版，与后端逻辑对应）────────────────────────────
+function parseMd(text) {
+  const blocks = [];
+  const lines  = text.split('\n');
+  let inCode = false, codeLines = [];
+  let skipCover = true;
+
+  // 检测正文最浅标题层级（第一个标题开始算）
+  let minLevel = 4, foundFirst = false;
+  for (const l of lines) {
+    if (!foundFirst && /^#{1,4}\s+/.test(l)) foundFirst = true;
+    if (foundFirst) {
+      const m = l.match(/^(#{1,4})\s+/);
+      if (m) minLevel = Math.min(minLevel, m[1].length);
+    }
+  }
+  if (minLevel === 4) minLevel = 1;
+  const levelOffset = minLevel - 1;
+
+  for (const line of lines) {
+    // 代码块
+    if (line.trim().startsWith('```')) {
+      if (!inCode) { inCode = true; codeLines = []; }
+      else { inCode = false; if (codeLines.length) blocks.push({type:'code', lines:[...codeLines]}); }
+      continue;
+    }
+    if (inCode) { codeLines.push(line); continue; }
+
+    const s = line.trim();
+
+    // 跳过封面：遇到第一个标题才开始
+    if (skipCover) {
+      if (/^#{1,4}\s+/.test(line)) {
+        skipCover = false;
+        // 封面大标题（含"课程设计"）跳过
+        const titleText = line.replace(/^#{1,4}\s+/, '').trim();
+        if (titleText.includes('课程设计') || titleText.includes('莆田学院')) continue;
+        // 否则继续往下解析
+      } else {
+        continue;
+      }
+    }
+
+    // 忽略分割线
+    if (s === '---') continue;
+
+    // 标题映射（自动层级偏移）
+    const h4 = line.match(/^####\s+(.*)/);
+    const h3 = line.match(/^###\s+(.*)/);
+    const h2 = line.match(/^##\s+(.*)/);
+    const h1 = line.match(/^#\s+(.*)/);
+
+    let rawLevel = 0, titleText = null;
+    if (h4)      { rawLevel = 4; titleText = h4[1].trim(); }
+    else if (h3) { rawLevel = 3; titleText = h3[1].trim(); }
+    else if (h2) { rawLevel = 2; titleText = h2[1].trim(); }
+    else if (h1) { rawLevel = 1; titleText = h1[1].trim(); }
+
+    if (rawLevel > 0) {
+      const mapped = Math.max(1, Math.min(rawLevel - levelOffset, 3));
+      blocks.push({type: `h${mapped}`, text: titleText});
+    } else if (s === '') {
+      blocks.push({type:'blank'});
+    } else {
+      let t = line.replace(/^　+/, '').trim();
+      t = t.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/`(.+?)`/g, '$1');
+      if (t) blocks.push({type:'body', text: t});
+    }
+  }
+  return blocks;
+}
+
+// ── 渲染预览 ─────────────────────────────────────────────────────────
+function renderPreview() {
+  const fmt    = getFmt();
+  const mdText = document.getElementById('md-input').value;
+  const inner  = document.getElementById('a4-inner');
+
+  // 页边距（cm → px，A4=794px宽）
+  const pl = cm2px(fmt.margin_left);
+  const pr = cm2px(fmt.margin_right);
+  const pt = cm2px(fmt.margin_top);
+  const pb = cm2px(fmt.margin_bottom);
+  inner.style.padding = `${pt}px ${pr}px ${pb}px ${pl}px`;
+
+  // 封面信息
+  const coverType = document.getElementById('cover-type').value;
+  const school  = fmt.school;
+  const course  = document.getElementById('course').value  || '大数据分析与可视化项目实战';
+  const topic   = document.getElementById('topic').value   || '（题目）';
+  const major   = document.getElementById('major').value   || '（专业班级）';
+  const teacher = document.getElementById('teacher').value || '（指导教师）';
+
+  let coverHtml = `<div class="pv-cover">
+    <span class="pv-cover-school">${esc(school)}</span>
+    <span class="pv-cover-title">课 程 设 计</span>`;
+
+  if (coverType === 'personal') {
+    const name = document.getElementById('name').value || '（姓名）';
+    const sid  = document.getElementById('sid').value  || '（学号）';
+    coverHtml += `
+    <span class="pv-cover-info">课程名称：${esc(course)}</span>
+    <span class="pv-cover-info">题&nbsp;&nbsp;&nbsp;&nbsp;目：${esc(topic)}</span>
+    <span class="pv-cover-info">学生姓名：${esc(name)}</span>
+    <span class="pv-cover-info">学&nbsp;&nbsp;&nbsp;&nbsp;号：${esc(sid)}</span>
+    <span class="pv-cover-info">专业班级：${esc(major)}</span>
+    <span class="pv-cover-info">指导教师：${esc(teacher)}</span>`;
+  } else {
+    const names = [...document.querySelectorAll('.m-name')].map(i=>i.value||'（姓名）');
+    const sids  = [...document.querySelectorAll('.m-sid')].map(i=>i.value||'（学号）');
+    coverHtml += `
+    <span class="pv-cover-info">课程名称：${esc(course)}</span>
+    <span class="pv-cover-info">题&nbsp;&nbsp;&nbsp;&nbsp;目：${esc(topic)}</span>`;
+    names.forEach((n,i) => { coverHtml += `<span class="pv-cover-info">姓名学号：${esc(n)}&nbsp;&nbsp;${esc(sids[i])}</span>`; });
+    coverHtml += `
+    <span class="pv-cover-info">专业班级：${esc(major)}</span>
+    <span class="pv-cover-info">指导教师：${esc(teacher)}</span>`;
+  }
+  coverHtml += `<span class="pv-cover-date">202&nbsp;&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日</span></div>
+  <hr class="pv-cover-divider" />`;
+
+  // 正文 blocks → HTML
+  const blocks = parseMd(mdText);
+  const lh     = fmt.line_spacing;
+  const bodyPx = fmt.body_size * 1.333; // pt → px
+  const indentPx = bodyPx * 2;
+
+  let bodyHtml = '';
+  for (const b of blocks) {
+    if (b.type === 'blank') continue;
+    if (b.type === 'h1') {
+      const sz = fmt.h1_size * 1.333;
+      bodyHtml += `<p style="font-family:${cnFont(fmt.h1_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h1_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.75}px 0 ${sz*0.375}px;">${esc(b.text)}</p>`;
+    } else if (b.type === 'h2') {
+      const sz = fmt.h2_size * 1.333;
+      bodyHtml += `<p style="font-family:${cnFont(fmt.h2_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h2_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.375}px 0 ${sz*0.188}px;">${esc(b.text)}</p>`;
+    } else if (b.type === 'h3') {
+      const sz = fmt.h3_size * 1.333;
+      bodyHtml += `<p style="font-family:${cnFont(fmt.h3_font)},'Times New Roman';font-size:${sz}px;font-weight:${fmt.h3_bold?'bold':'normal'};line-height:${lh};margin:${sz*0.286}px 0 ${sz*0.143}px;">${esc(b.text)}</p>`;
+    } else if (b.type === 'body') {
+      bodyHtml += `<p style="font-family:${cnFont(fmt.body_font)},'Times New Roman';font-size:${bodyPx}px;line-height:${lh};text-indent:${indentPx}px;text-align:justify;margin:0;">${esc(b.text)}</p>`;
+    } else if (b.type === 'code') {
+      const codeContent = b.lines.map(l => esc(l)).join('\n');
+      bodyHtml += `<pre class="pv-code-block">${codeContent}</pre>`;
+    }
+  }
+
+  inner.innerHTML = coverHtml + bodyHtml;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 防抖，300ms 后渲染
+let _timer = null;
+function schedulePreview() {
+  clearTimeout(_timer);
+  _timer = setTimeout(renderPreview, 300);
+}
+
+// ── 表单交互 ─────────────────────────────────────────────────────────
+function onTypeChange() {
+  const t = document.getElementById('cover-type').value;
+  document.getElementById('personal-section').style.display = t==='personal' ? '' : 'none';
+  document.getElementById('members-section').style.display  = t==='group'    ? '' : 'none';
+  schedulePreview();
+}
+
+function addMember() {
+  const list = document.getElementById('members-list');
+  const row  = document.createElement('div');
+  row.className = 'member-row';
+  row.innerHTML = `<input type="text" placeholder="姓名" class="m-name" oninput="schedulePreview()" />
+    <input type="text" placeholder="学号" class="m-sid" oninput="schedulePreview()" />
+    <button class="btn-remove" onclick="removeMember(this)">×</button>`;
+  list.appendChild(row);
+}
+
+function removeMember(btn) {
+  if (document.querySelectorAll('.member-row').length > 1) { btn.parentElement.remove(); schedulePreview(); }
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg; el.className = type || '';
+}
+
+// ── 生成下载 ─────────────────────────────────────────────────────────
+async function generate() {
+  const mdText = document.getElementById('md-input').value.trim();
+  if (!mdText) { setStatus('请先粘贴 Markdown 内容', 'error'); return; }
+
+  const fmt        = getFmt();
+  const coverType  = document.getElementById('cover-type').value;
+  const payload    = {
+    cover_type: coverType,
+    md_text:    mdText,
+    course:  document.getElementById('course').value,
+    topic:   document.getElementById('topic').value,
+    major:   document.getElementById('major').value,
+    teacher: document.getElementById('teacher').value,
+    fmt,
+  };
+
+  if (coverType === 'personal') {
+    payload.name = document.getElementById('name').value;
+    payload.sid  = document.getElementById('sid').value;
+  } else {
+    const names = document.querySelectorAll('.m-name');
+    const sids  = document.querySelectorAll('.m-sid');
+    payload.members = Array.from(names).map((n,i) => ({name:n.value, sid:sids[i].value}));
+  }
+
+  const btn = document.getElementById('btn-gen');
+  btn.disabled = true; setStatus('生成中...');
+
+  try {
+    const res = await fetch('/convert', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) { const e = await res.json(); setStatus(e.error||'生成失败','error'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `课程设计报告-${coverType==='personal'?(payload.name||'报告'):'小组'}.docx`;
+    a.click(); URL.revokeObjectURL(url);
+    setStatus('✓ 下载成功', 'success');
+  } catch(e) { setStatus('网络错误，请重试','error'); }
+  finally { btn.disabled = false; }
+}
+</script>
+</body>
+</html>
