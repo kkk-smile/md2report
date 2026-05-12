@@ -146,43 +146,80 @@
     <div class="form-group"><label>题目</label><input id="topic"   type="text" placeholder="学生成绩管理系统" oninput="schedulePreview()" /></div>
     <div class="form-group"><label>专业班级</label><input id="major"  type="text" placeholder="数据23" oninput="schedulePreview()" /></div>
     <div class="form-group"><label>指导教师</label><input id="teacher" type="text" placeholder="（指导教师姓名）" oninput="schedulePreview()" /></div>
+    <div class="form-group"><label>下载文件名 <span style="color:#aaa;font-weight:normal">（留空自动生成）</span></label><input id="filename" type="text" placeholder="课程设计报告-张三" /></div>
   </div>
 
   <div class="card">
     <div class="card-title">格式设置</div>
     <div class="form-group"><label>学校名称</label><input id="fmt-school" type="text" placeholder="莆田学院新工科产业学院" oninput="schedulePreview()" /></div>
 
-    <div class="sub-label">一级标题（## ）</div>
+    <div class="sub-label">一级标题（# ）</div>
     <div class="row3">
       <div class="form-group" style="margin:0"><label>中文字体</label>
         <select id="fmt-h1-font" onchange="schedulePreview()">
           <option value="黑体" selected>黑体</option><option value="宋体">宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
         </select>
       </div>
-      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h1-size" type="number" value="16" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>字号</label>
+        <select id="fmt-h1-size" onchange="schedulePreview()">
+          <option value="26">一号 26pt</option>
+          <option value="24">小一 24pt</option>
+          <option value="22">二号 22pt</option>
+          <option value="18">小二 18pt</option>
+          <option value="16" selected>三号 16pt</option>
+          <option value="15">小三 15pt</option>
+          <option value="14">四号 14pt</option>
+          <option value="12">小四 12pt</option>
+          <option value="10.5">五号 10.5pt</option>
+        </select>
+      </div>
       <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h1-bold" type="checkbox" style="margin-top:6px" onchange="schedulePreview()" /></div>
     </div>
     <div class="en-note">英文字体固定为 Times New Roman</div>
 
-    <div class="sub-label">二级标题（### ）</div>
+    <div class="sub-label">二级标题（## ）</div>
     <div class="row3">
       <div class="form-group" style="margin:0"><label>中文字体</label>
         <select id="fmt-h2-font" onchange="schedulePreview()">
           <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
         </select>
       </div>
-      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h2-size" type="number" value="16" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>字号</label>
+        <select id="fmt-h2-size" onchange="schedulePreview()">
+          <option value="26">一号 26pt</option>
+          <option value="24">小一 24pt</option>
+          <option value="22">二号 22pt</option>
+          <option value="18">小二 18pt</option>
+          <option value="16" selected>三号 16pt</option>
+          <option value="15">小三 15pt</option>
+          <option value="14">四号 14pt</option>
+          <option value="12">小四 12pt</option>
+          <option value="10.5">五号 10.5pt</option>
+        </select>
+      </div>
       <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h2-bold" type="checkbox" style="margin-top:6px" checked onchange="schedulePreview()" /></div>
     </div>
 
-    <div class="sub-label">三级标题（#### ）</div>
+    <div class="sub-label">三级标题（### ）</div>
     <div class="row3">
       <div class="form-group" style="margin:0"><label>中文字体</label>
         <select id="fmt-h3-font" onchange="schedulePreview()">
           <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
         </select>
       </div>
-      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-h3-size" type="number" value="14" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>字号</label>
+        <select id="fmt-h3-size" onchange="schedulePreview()">
+          <option value="26">一号 26pt</option>
+          <option value="24">小一 24pt</option>
+          <option value="22">二号 22pt</option>
+          <option value="18">小二 18pt</option>
+          <option value="16">三号 16pt</option>
+          <option value="15">小三 15pt</option>
+          <option value="14" selected>四号 14pt</option>
+          <option value="12">小四 12pt</option>
+          <option value="10.5">五号 10.5pt</option>
+        </select>
+      </div>
       <div class="form-group" style="margin:0;text-align:center"><label>加粗</label><br/><input id="fmt-h3-bold" type="checkbox" style="margin-top:6px" checked onchange="schedulePreview()" /></div>
     </div>
 
@@ -193,7 +230,19 @@
           <option value="黑体">黑体</option><option value="宋体" selected>宋体</option><option value="楷体">楷体</option><option value="仿宋">仿宋</option>
         </select>
       </div>
-      <div class="form-group" style="margin:0"><label>字号 pt</label><input id="fmt-body-size" type="number" value="12" min="8" max="72" oninput="schedulePreview()" /></div>
+      <div class="form-group" style="margin:0"><label>字号</label>
+        <select id="fmt-body-size" onchange="schedulePreview()">
+          <option value="26">一号 26pt</option>
+          <option value="24">小一 24pt</option>
+          <option value="22">二号 22pt</option>
+          <option value="18">小二 18pt</option>
+          <option value="16">三号 16pt</option>
+          <option value="15">小三 15pt</option>
+          <option value="14">四号 14pt</option>
+          <option value="12" selected>小四 12pt</option>
+          <option value="10.5">五号 10.5pt</option>
+        </select>
+      </div>
       <div class="form-group" style="margin:0"><label>行距</label><input id="fmt-line-spacing" type="number" value="1.5" min="1" max="3" step="0.25" oninput="schedulePreview()" /></div>
     </div>
 
@@ -510,7 +559,10 @@ async function generate() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href = url;
-    a.download = `课程设计报告-${coverType==='personal'?(payload.name||'报告'):'小组'}.docx`;
+    const customName = document.getElementById('filename').value.trim();
+    const autoName   = coverType === 'personal' ? (payload.name || '报告') : '小组';
+    const finalName  = customName || `课程设计报告-${autoName}`;
+    a.download = finalName.endsWith('.docx') ? finalName : finalName + '.docx';
     a.click(); URL.revokeObjectURL(url);
     setStatus('✓ 下载成功', 'success');
   } catch(e) { setStatus('网络错误，请重试','error'); }
